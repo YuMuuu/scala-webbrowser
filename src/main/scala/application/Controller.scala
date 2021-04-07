@@ -1,44 +1,41 @@
 package application
 
-import javafx.beans.value.ChangeListener
+
+
+import javafx.beans.property.ReadOnlyObjectProperty
 import scalafx.application.ConditionalFeature.FXML
 import scalafx.scene.control.TextField
 import scalafx.scene.input.KeyCode.ENTER
 import scalafx.scene.web.WebView
-import javafx.beans.value.ObservableValue
-import javafx.concurrent.Worker.{State => JavaState}
-import scalafx.concurrent.Worker.{State => ScalaState}
 import scalafx.event.ActionEvent
 import scalafxml.core.macros.sfxml
 import scalafx.scene.control.TextField
 import scalafx.scene.input.KeyEvent
 import scalafx.scene.web.WebEngine
-import javafx.scene.web.WebHistory
 import scalafx.scene.web.WebView
+import javafx.scene.web.WebHistory
+import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
+import javafx.concurrent.Worker.State
 
 @sfxml
 class Controller(addressBar: TextField, webView: WebView) {
-  ////  @FXML
-  //  private var  addressBar:TextField
-  ////  @FXML
-  //  private var webView: WebView
-
   //JavaScript標準関数実行準備
-  //          JSFunctionManager.doCreate(webView.getEngine());
+  JSFunctionManager.doCreate(webView.engine)
 
   //ページロードイベントでアドレスバーの更新
   webView.engine.getLoadWorker.stateProperty()
     .addListener(
-      new ChangeListener[JavaState] {
-        def changed(var1: ObservableValue[_ <: JavaState], oldState: JavaState, newState: JavaState): Unit = {
-          if (newState == JavaState.SUCCEEDED) {
+      new ChangeListener[State] {
+        def changed(var1: ObservableValue[_ <: State], oldState: State, newState: State): Unit = {
+          if (newState == State.SUCCEEDED) {
             addressBar.text_=(webView.engine.location())
           }
         }
       }
     )
 
-  load("https://www.google.co.jp/");
+  load("https://www.google.co.jp/")
 
   //アドレスバーでEnter
   def onAddressBarEvent(e: KeyEvent): Unit = {
@@ -48,7 +45,7 @@ class Controller(addressBar: TextField, webView: WebView) {
   }
 
   //URLロード
-  private def load(search: String): Unit = {
+  def load(search: String): Unit = {
     var a = search
     if (!search.matches("^https{0,1}://.+")) {
       //httpじゃないならgoogle検索を実行
